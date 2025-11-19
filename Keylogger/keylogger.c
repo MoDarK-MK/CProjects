@@ -54,7 +54,7 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
         }
         fclose(logfile);
     }
-    return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
+    return CallNextHookEx(NULL , nCode, wParam, lParam);
 }
 
 int WinMain(HINSTANCE hIntance, HINSTANCE hPrevInstance, LPSTR cmdline, int show) {
